@@ -5,35 +5,58 @@ import pandas as pd
 
 from record_model import Record
 from feature_extractor_model import FeatureExtractor
-from feature_storage_model import FeatureStorage
+from record_features_model import RecordFeatures
 
 
-def get_file_names_in_dir(path: str, extension: str):
+def get_file_pathes_in_dir(path: str, extension: str):
     file_names = []
-    for file in os.listdir(path):
-        if file.endswith(".{}".format(extension)):
-            file_names.append(file)
+    for file_name in os.listdir(path):
+        if file_name.endswith(".{}".format(extension)):
+            file_names.append("{}/{}".format(path, file_name))
     return file_names
 
 
-def extract_features_from_mat_files(mat_file_names):
-    features = []
-    for file_name in mat_file_names:
-        mat_data = loadmat(file_name).get('s')[0]
+def extract_features_from_mat_files(mat_file_pathes):
+    record_features_set = []
+    for file_path in mat_file_pathes:
+        mat_data = loadmat(file_path).get('s')[0]
+        file_name = extract_name_from_path(file_path)
         for mat_data_element in mat_data:
             record = Record(mat_data_element, file_name)
-            extractor = FeatureExtractor(record)
-            feature_set = FeatureStorage(extractor)
-            features.append(feature_set)
-    return features
+            if "ОС ЗГ" in record.record_name or "ОС ОГ" in record.record_name:
+                extractor = FeatureExtractor(record)
+                record_features = RecordFeatures.init_from_feature_extractor(extractor)
+                record_features_set.append(record_features)
+    return record_features_set
 
 
-mat_file_names = get_file_names_in_dir('.', 'mat')
-features = extract_features_from_mat_files(mat_file_names)
+def extract_name_from_path(path):
+    file_name_with_extension = path.split('/')[-1]
+    return file_name_with_extension.split('.')[0]
+
+
+# mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/water_jumps', 'mat')
+# features = extract_features_from_mat_files(mat_file_pathes)
 
 # json0 = json.dumps(features[0].__dict__, sort_keys=False)
 # print(json0)
 
-features_frame = pd.DataFrame.from_records([f.to_export_dict() for f in features])
-features_frame.to_excel("features.xlsx")
+# features_frame = pd.DataFrame.from_records([f.to_export_dict() for f in features])
+# features_frame.to_excel("features.xlsx")
 # print(features_frame)
+
+import matplotlib.pyplot as plt
+import record_visualization as visualizer
+
+mat_data = loadmat('Violeta_Sverchkova_01-Nov-2018.mat').get('s')[0]
+record = Record(mat_data[0], 'Violeta_Sverchkova_01-Nov-2018')
+extractor = FeatureExtractor(record)
+plt.figure(0)
+visualizer.plot_force_signals(plt, record.get_time_vector(), record.force_signals)
+plt.figure(1)
+visualizer.plot_cop_signal(plt, record.cop.x, record.cop.y)
+plt.figure(2)
+visualizer.plot_fft(extractor.fft_x_vect, extractor.f_x_vect, 'X')
+plt.figure(3)
+visualizer.plot_fft(extractor.fft_y_vect, extractor.f_y_vect, 'Y')
+plt.show()

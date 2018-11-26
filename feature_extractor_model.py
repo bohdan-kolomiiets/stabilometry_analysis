@@ -13,23 +13,10 @@ class FeatureExtractor:
         self.dy_vect = np.diff(record.cop.y)
         self.__path_vect = self.__get_path_vect()
         self.__angle_vect = self.__get_angle_vect()
-        self.f_vect, self.fftx_vect = math_helper.calc_fft(record.cop.x, record.f_hz)
-        self.f_vect, self.ffty_vect = math_helper.calc_fft(record.cop.y, record.f_hz)
-        self.f_vect, self.fft_path_vect = math_helper.calc_fft(self.__path_vect, record.f_hz)
-        self.f_vect, self.fft_angle_vect = math_helper.calc_fft(self.__angle_vect, record.f_hz)
-        pass
-
-    def mean_x(self):
-        return np.mean(self.record.cop.x)
-
-    def mean_y(self):
-        return np.mean(self.record.cop.y)
-
-    def std_x(self):
-        return np.std(self.record.cop.x)
-
-    def std_y(self):
-        return np.std(self.record.cop.y)
+        self.f_x_vect, self.fft_x_vect = math_helper.calc_fft(record.cop.x, record.f_hz)
+        self.f_y_vect, self.fft_y_vect = math_helper.calc_fft(record.cop.y, record.f_hz)
+        self.f_path_vect, self.fft_path_vect = math_helper.calc_fft(self.__path_vect, record.f_hz)
+        self.f_angle_vect, self.fft_angle_vect = math_helper.calc_fft(self.__angle_vect, record.f_hz)
 
     def __get_path_vect(self):
         return np.sqrt(self.dx_vect * self.dx_vect + self.dy_vect * self.dy_vect)
@@ -46,8 +33,10 @@ class FeatureExtractor:
         return vx, vy
 
     def modified_turns_index(self):
-        x_el = self.dx_vect / self.std_x()
-        y_el = self.dy_vect / self.std_y()
+        std_x = np.std(self.record.cop.x)
+        std_y = np.std(self.record.cop.y)
+        x_el = self.dx_vect / std_x
+        y_el = self.dy_vect / std_y
         return np.sum(np.sqrt(x_el * x_el + y_el * y_el)) / self.record.signal_len
 
     def __get_angle_vect(self):
@@ -94,7 +83,8 @@ class FeatureExtractor:
             f2 = f[-1]
         f_part, fft_part = FeatureExtractor.__get_fft_part(fft, f, f1, f2)
         df = f[1] - f[0]
-        return np.mean(pow(fft_part, 2)) / df
+        #https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html
+        return np.sum(pow(fft_part, 2)) / (f2-f1) #  np.mean(pow(fft_part, 2)) / df
 
     @staticmethod
     def spectral_power(fft, f, f1, f2):
