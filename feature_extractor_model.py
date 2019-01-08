@@ -1,5 +1,6 @@
 import numpy as np
 import statistics as stat
+import scipy.signal as sci_sig
 from typing import Tuple
 
 import math_helper
@@ -11,21 +12,21 @@ class FeatureExtractor:
         self.record = record
         self.dx_vect = np.diff(record.cop.x)
         self.dy_vect = np.diff(record.cop.y)
-        self.__path_vect = self.__get_path_vect()
-        self.__angle_vect = self.__get_angle_vect()
+        self.path_vect = self.__get_path_vect()
+        self.angle_vect = self.__get_angle_vect()
         self.f_x_vect, self.fft_x_vect = math_helper.calc_fft(record.cop.x, record.f_hz)
         self.f_y_vect, self.fft_y_vect = math_helper.calc_fft(record.cop.y, record.f_hz)
-        self.f_path_vect, self.fft_path_vect = math_helper.calc_fft(self.__path_vect, record.f_hz)
-        self.f_angle_vect, self.fft_angle_vect = math_helper.calc_fft(self.__angle_vect, record.f_hz)
+        self.f_path_vect, self.fft_path_vect = math_helper.calc_fft(self.path_vect, record.f_hz)
+        self.f_angle_vect, self.fft_angle_vect = math_helper.calc_fft(self.angle_vect, record.f_hz)
 
     def __get_path_vect(self):
         return np.sqrt(self.dx_vect * self.dx_vect + self.dy_vect * self.dy_vect)
 
     def mean_path_velocity(self):
-        return self.__path_vect.sum() / self.record.duration_sec
+        return self.path_vect.sum() / self.record.duration_sec
 
     def meadian_path_velocity(self):
-        return stat.median(self.__path_vect) * self.record.f_hz
+        return stat.median(self.path_vect) * self.record.f_hz
 
     def mean_axes_velocity(self) -> Tuple[float, float]:
         vx = np.sum(abs(self.dx_vect)) / self.record.duration_sec
@@ -51,16 +52,16 @@ class FeatureExtractor:
                 return 270
 
         shift_angles_vect = [shift_angle(dx_el, dy_el) for dx_el, dy_el in zip(self.dx_vect, self.dy_vect)]
-        return np.arcsin(self.dy_vect / self.__path_vect) + shift_angles_vect
+        return np.arcsin(self.dy_vect / self.path_vect) + shift_angles_vect
 
     def mean_angle(self):
-        return np.mean(self.__angle_vect)
+        return np.mean(self.angle_vect)
 
     def mean_weighted_angle(self):
-        return np.sum(self.__angle_vect * self.__path_vect) / np.sum(self.__path_vect) / self.record.signal_len
+        return np.sum(self.angle_vect * self.path_vect) / np.sum(self.path_vect) / self.record.signal_len
 
     def angles_quartile(self, quartile):
-        return FeatureExtractor.__quartile(self.__angle_vect, quartile)
+        return FeatureExtractor.__quartile(self.angle_vect, quartile)
 
     @staticmethod
     def __quartile(signal, p):
@@ -85,6 +86,11 @@ class FeatureExtractor:
         df = f[1] - f[0]
         #https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html
         return np.sum(pow(fft_part, 2)) / (f2-f1) #  np.mean(pow(fft_part, 2)) / df
+
+    @staticmethod
+    def psd_welch(x, fs):
+        f, fft = sci_sig.welch(x, fs, scaling='density')
+        return np.mean(fft)
 
     @staticmethod
     def spectral_power(fft, f, f1, f2):

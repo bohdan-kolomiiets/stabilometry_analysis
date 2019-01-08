@@ -35,28 +35,41 @@ def extract_name_from_path(path):
     return file_name_with_extension.split('.')[0]
 
 
-# mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/water_jumps', 'mat')
-# features = extract_features_from_mat_files(mat_file_pathes)
+mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/rowing', 'mat')
+#  rowing, water_jumps, healthy
+features = extract_features_from_mat_files(mat_file_pathes)
 
 # json0 = json.dumps(features[0].__dict__, sort_keys=False)
 # print(json0)
 
-# features_frame = pd.DataFrame.from_records([f.to_export_dict() for f in features])
-# features_frame.to_excel("features.xlsx")
-# print(features_frame)
+features_frame = pd.DataFrame.from_records([f.to_export_dict() for f in features])
+features_frame.to_excel("rowing.xlsx")
+print(features_frame)
 
-import matplotlib.pyplot as plt
-import record_visualization as visualizer
+# import matplotlib.pyplot as plt
+# import record_visualization as visualizer
 
-mat_data = loadmat('Violeta_Sverchkova_01-Nov-2018.mat').get('s')[0]
-record = Record(mat_data[0], 'Violeta_Sverchkova_01-Nov-2018')
-extractor = FeatureExtractor(record)
-plt.figure(0)
-visualizer.plot_force_signals(plt, record.get_time_vector(), record.force_signals)
-plt.figure(1)
-visualizer.plot_cop_signal(plt, record.cop.x, record.cop.y)
-plt.figure(2)
-visualizer.plot_fft(extractor.fft_x_vect, extractor.f_x_vect, 'X')
-plt.figure(3)
-visualizer.plot_fft(extractor.fft_y_vect, extractor.f_y_vect, 'Y')
-plt.show()
+# plt.rcParams.update({'font.size': 22})
+
+# mat_data = loadmat('Violeta_Sverchkova_01-Nov-2018.mat').get('s')[0]
+# record = Record(mat_data[9], 'Violeta_Sverchkova_01-Nov-2018')
+# extractor = FeatureExtractor(record)
+
+# plt.figure(0)
+# visualizer.plot_force_signals(plt, record.get_time_vector(), record.force_signals)
+# plt.figure(1)
+# visualizer.plot_cop_signal(plt, record.cop.x, record.cop.y)
+# plt.figure(2)
+# visualizer.plot_fft(extractor.fft_x_vect, extractor.f_x_vect, 'X')
+# plt.figure(3)
+# visualizer.plot_fft(extractor.fft_y_vect, extractor.f_y_vect, 'Y')
+# plt.figure(4)
+# plt.plot(record.get_time_vector(), record.cop.x, label="X")
+# plt.plot(record.get_time_vector(), record.cop.y, label="Y")
+# plt.title("CoP Oscillations in X and Y planes")
+# plt.xlabel("time, s")
+# plt.ylabel("distance from center, cm")
+# plt.grid(True)
+#plt.figure(5)
+# visualizer.plot_cop_with_ellipse(record.cop.x, record.cop.y, extractor.prediction_ellipse(), 'cm')
+# plt.show()

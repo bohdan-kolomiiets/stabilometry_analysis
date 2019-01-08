@@ -44,18 +44,22 @@ class RecordFeatures:
         feactures.angle_quartile95 = extractor.angles_quartile(0.95)
 
         feactures.psd_angle = extractor.psd(extractor.fft_angle_vect, extractor.f_angle_vect)
+        feactures.psd_welch_angle = extractor.psd_welch(extractor.angle_vect, extractor.record.f_hz)
         feactures.edge_freq_angle99, _, _ = extractor.edge_freq(extractor.fft_angle_vect, extractor.f_angle_vect, 0.99)
         feactures.spect_centroid_angle_freq = extractor.spectral_centroid_freq(extractor.fft_angle_vect, extractor.f_angle_vect)
 
         feactures.psd_x = extractor.psd(extractor.fft_x_vect, extractor.f_x_vect)
+        feactures.psd_welch_x = extractor.psd_welch(extractor.record.cop.x, extractor.record.f_hz)
         feactures.edge_freq_x99, _, _ = extractor.edge_freq(extractor.fft_x_vect, extractor.f_x_vect, 0.99)
         feactures.spect_centroid_x_freq = extractor.spectral_centroid_freq(extractor.fft_x_vect, extractor.f_x_vect)
 
         feactures.psd_y = extractor.psd(extractor.fft_y_vect, extractor.f_y_vect)
+        feactures.psd_welch_y = extractor.psd_welch(extractor.record.cop.y, extractor.record.f_hz)
         feactures.edge_freq_y99, _, _ = extractor.edge_freq(extractor.fft_y_vect, extractor.f_y_vect, 0.99)
         feactures.spect_centroid_y_freq = extractor.spectral_centroid_freq(extractor.fft_y_vect, extractor.f_y_vect)
 
         feactures.psd_path = extractor.psd(extractor.fft_path_vect, extractor.f_path_vect)
+        feactures.psd_welch_path = extractor.psd_welch(extractor.path_vect, extractor.record.f_hz)
         feactures.edge_freq_path99, _, _ = extractor.edge_freq(extractor.fft_path_vect, extractor.f_path_vect, 0.99)
         feactures.spect_centroid_path_freq = extractor.spectral_centroid_freq(extractor.fft_path_vect, extractor.f_path_vect)
 
@@ -97,18 +101,22 @@ class RecordFeatures:
         features.angle_quartile95 = row["angle_quartile95"]
 
         features.psd_angle = row["psd_angle"]
+        features.psd_welch_angle = row["psd_welch_angle"]
         features.edge_freq_angle99 = row["edge_freq_angle99"]
         features.spect_centroid_angle_freq = row["spect_centroid_angle_freq"]
 
         features.psd_x = row["psd_x"]
+        features.psd_welch_x = row["psd_welch_x"]
         features.edge_freq_x99 = row["edge_freq_x99"]
         features.spect_centroid_x_freq = row["spect_centroid_x_freq"]
 
         features.psd_y = row["psd_y"]
+        features.psd_welch_y = row["psd_welch_y"]
         features.edge_freq_y99 = row["edge_freq_y99"]
         features.spect_centroid_y_freq = row["spect_centroid_y_freq"]
 
         features.psd_path = row["psd_path"]
+        features.psd_welch_path = row["psd_welch_path"]
         features.edge_freq_path99 = row["edge_freq_path99"]
         features.spect_centroid_path_freq = row["spect_centroid_path_freq"]
 
@@ -147,18 +155,22 @@ class RecordFeatures:
             ('angle_quartile95', self.angle_quartile95),
 
             ('psd_angle', self.psd_angle),
+            ('psd_welch_angle', self.psd_welch_angle),
             ('edge_freq_angle99', self.edge_freq_angle99),
             ('spect_centroid_angle_freq', self.spect_centroid_angle_freq),
 
             ('psd_x', self.psd_x),
+            ('psd_welch_x', self.psd_welch_x),
             ('edge_freq_x99', self.edge_freq_x99),
             ('spect_centroid_x_freq', self.spect_centroid_x_freq),
 
             ('psd_y', self.psd_y),
+            ('psd_welch_y', self.psd_welch_y),
             ('edge_freq_y99', self.edge_freq_y99),
             ('spect_centroid_y_freq', self.spect_centroid_y_freq),
 
             ('psd_path', self.psd_path),
+            ('psd_welch_path', self.psd_welch_path),
             ('edge_freq_path99', self.edge_freq_path99),
             ('spect_centroid_path_freq', self.spect_centroid_path_freq)
         ])

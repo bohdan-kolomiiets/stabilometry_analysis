@@ -4,17 +4,17 @@ import numpy as np
 class Record:
 
     def __init__(self, mat_record, patient_name):
-        self.id = mat_record[0]
+        self.id = mat_record["Id"][0][0]
         self.patient_name = patient_name
-        self.date = mat_record[1]
-        self.calibrate_perc = np.array(mat_record[2][0])
-        self.calibrate_scale = np.array(mat_record[2][1])
-        self.calibrate_offset = np.array(mat_record[2][2])
-        self.record_name = mat_record[3][0]
-        self.record_info = mat_record[4]
+        self.date = mat_record["DateTime"][0]
+        self.calibrate_perc = np.array(mat_record["CalibrValues"][0])
+        self.calibrate_scale = np.array(mat_record["CalibrValues"][1])
+        self.calibrate_offset = np.array(mat_record["CalibrValues"][2])
+        self.record_name = mat_record["Name"][0]
+        self.record_info = mat_record["Features"]
         self.f_hz = 10  # Hz - mat_record[5][0][0]
-        self.duration_sec = mat_record[6][0][0] - 1 / self.f_hz
-        self.raw_mass_signals = np.array(mat_record[8][:, 1:])
+        self.duration_sec = mat_record["T_seconds"][0][0] - 1 / self.f_hz
+        self.raw_mass_signals = np.array(mat_record["Signals"][:, 1:])
         self.signal_len = self.raw_mass_signals.shape[1]
         self.force_signals = self.__get_force_signals(self.raw_mass_signals)
         self.cop = self.__calc_cop()

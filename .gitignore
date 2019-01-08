@@ -1,5 +1,5 @@
 __pycache__/
 .idea/
-*.mat
-*.xlsx
-*.json
+# s*.mat
+# *.xlsx
+# *.json
