@@ -35,8 +35,7 @@ def extract_name_from_path(path):
     return file_name_with_extension.split('.')[0]
 
 
-mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/rowing', 'mat')
-#  rowing, water_jumps, healthy
+mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/rowing', extension='mat')#  rowing, water_jumps, healthy
 features = extract_features_from_mat_files(mat_file_pathes)
 
 # json0 = json.dumps(features[0].__dict__, sort_keys=False)
