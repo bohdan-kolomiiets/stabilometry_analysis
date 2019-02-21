@@ -25,7 +25,8 @@ def read_records_from_file(file_path):
         records.append(record)
     return records
 
-mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/rowing', extension='mat')#  rowing, water_jumps, healthy
+
+mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/healthy', extension='mat')#  rowing, water_jumps, healthy
 
 for file_path in mat_file_pathes:
     patient_records = read_records_from_file(file_path)
@@ -37,21 +38,5 @@ for file_path in mat_file_pathes:
         patient_export_list.append({'xop_y'})
         patient_export_list.append(record.cop.y)
     df = pd.DataFrame.from_records(patient_export_list)
-    df.to_excel(f'rowing_{extract_name_from_path(file_path)}.xlsx', index=False)
+    df.to_excel(f'Data/healthy/healthy_{extract_name_from_path(file_path)}.xlsx', index=False)
 
-
-# list_to_export = []
-# for file_path in mat_file_pathes:
-#     mat_data = loadmat(file_path).get('s')[0]
-#     file_name = extract_name_from_path(file_path)
-#     for mat_data_element in mat_data:
-#         record = Record(mat_data_element, file_name)
-#         data_to_export = OrderedDict([
-#             ('patient', record.patient_name), 
-#             ('record', record.record_name), 
-#             ('cop_x', record.cop.x),
-#             ('cop_y', record.cop.y)])
-#         list_to_export.append(data_to_export)
-
-# df = pd.DataFrame.from_records(list_to_export)
-# df.to_excel('rowing_raw_cop_signals.xlsx')

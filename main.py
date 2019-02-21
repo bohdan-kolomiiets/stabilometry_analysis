@@ -7,6 +7,7 @@ from record_model import Record
 from feature_extractor_model import FeatureExtractor
 from record_features_model import RecordFeatures
 
+import dma_first_results.dma as DMA
 
 def get_file_pathes_in_dir(path: str, extension: str):
     file_names = []
@@ -33,6 +34,9 @@ def extract_features_from_mat_files(mat_file_pathes):
 def extract_name_from_path(path):
     file_name_with_extension = path.split('/')[-1]
     return file_name_with_extension.split('.')[0]
+
+# mat_data = loadmat('C:/Users/BohdanK/Dropbox/StabiloData/rowing/chernomorov_26-Nov-2018.mat').get('s')[0]
+# record = Record(mat_data[9], 'chernomorov_26-Nov-2018')
 
 
 mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/rowing', extension='mat')#  rowing, water_jumps, healthy
