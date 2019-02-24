@@ -1,12 +1,9 @@
 from collections import OrderedDict
-
-from record_features_model import RecordFeatures
 import pandas as pd
 import scipy.stats as sts
 import numpy as np
 
-
-# ------------------------------------
+from core.record_features_model import RecordFeatures
 
 
 def test_normality(data_vector):
@@ -125,6 +122,9 @@ for (feature_key, open_eyes_features), (feature_key, close_eyes_features) \
 
 open_close_not_similar_dict = {key: val for key, val in open_close_similarity_dict.items() if val[0] < 0.05}
 print('are similar:', sorted(open_close_not_similar_dict.items(), key=lambda kv: kv[1]))
+
+
+
 
 # import matplotlib.pyplot as plt
 #

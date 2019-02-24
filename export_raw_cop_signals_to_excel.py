@@ -3,7 +3,7 @@ from scipy.io import loadmat
 import pandas as pd
 from collections import OrderedDict
 
-from record_model import Record
+from core.record_model import Record
 
 def get_file_pathes_in_dir(path: str, extension: str):
     file_names = []
@@ -26,17 +26,18 @@ def read_records_from_file(file_path):
     return records
 
 
-mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/healthy', extension='mat')#  rowing, water_jumps, healthy
+if __name__ == "__main__":
+    mat_file_pathes = get_file_pathes_in_dir('C:/Users/BohdanK/Dropbox/StabiloData/healthy', extension='mat')#  rowing, water_jumps, healthy
 
-for file_path in mat_file_pathes:
-    patient_records = read_records_from_file(file_path)
-    patient_export_list = []
-    for record in patient_records:
-        patient_export_list.append({record.record_name})
-        patient_export_list.append({'xop_x'})
-        patient_export_list.append(record.cop.x)
-        patient_export_list.append({'xop_y'})
-        patient_export_list.append(record.cop.y)
-    df = pd.DataFrame.from_records(patient_export_list)
-    df.to_excel(f'Data/healthy/healthy_{extract_name_from_path(file_path)}.xlsx', index=False)
+    for file_path in mat_file_pathes:
+        patient_records = read_records_from_file(file_path)
+        patient_export_list = []
+        for record in patient_records:
+            patient_export_list.append({record.record_name})
+            patient_export_list.append({'xop_x'})
+            patient_export_list.append(record.cop.x)
+            patient_export_list.append({'xop_y'})
+            patient_export_list.append(record.cop.y)
+        df = pd.DataFrame.from_records(patient_export_list)
+        df.to_excel(f'Data/healthy/healthy_{extract_name_from_path(file_path)}.xlsx', index=False)
 

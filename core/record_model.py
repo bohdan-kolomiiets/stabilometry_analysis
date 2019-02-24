@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.io import loadmat
 
 class Record:
 
@@ -18,6 +18,25 @@ class Record:
         self.signal_len = self.raw_mass_signals.shape[1]
         self.force_signals = self.__get_force_signals(self.raw_mass_signals)
         self.cop = self.__calc_cop()
+
+    @staticmethod
+    def extract_records_from_mat_file(file_path, selected_tests=None):
+        patient_tests_set = loadmat(file_path).get('s')[0]
+        file_name = Record.__extract_name_from_path(file_path)
+
+        records = []
+        for patient_test in patient_tests_set:
+            record = Record(patient_test, file_name)
+            if (selected_tests == None) or (record.record_name in selected_tests):
+                records.append(record)
+
+        return records
+
+    @staticmethod
+    def __extract_name_from_path(path):
+        file_name_with_extension = path.split('/')[-1]
+        return file_name_with_extension.split('.')[0]
+
 
     def __get_force_signals(self, raw_mass_signals):
         normalized_mass = self.__normalize_mass(raw_mass_signals)

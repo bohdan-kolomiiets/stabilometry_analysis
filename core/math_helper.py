@@ -10,7 +10,7 @@ def calc_fft(x, fs):
     return f, fourier
 
 
-def __test_calc_fft():
+if __name__ == "__main__":
     N = 300
     T = 30  # sec
     t = np.linspace(0, T, N)

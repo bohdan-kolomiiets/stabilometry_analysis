@@ -1,10 +1,25 @@
-import numpy as np
-from collections import OrderedDict
-
+from record_model import Record
 from feature_extractor_model import FeatureExtractor
 
+from typing import List
+from collections import OrderedDict
+import numpy as np
 
 class RecordFeatures:
+
+    @staticmethod
+    def extract_features_from_patien_records(patient_records: List[Record]):
+        return map(lambda rec: RecordFeatures.init_from_feature_extractor(FeatureExtractor(rec)), 
+                patient_records)
+
+    @staticmethod
+    def extract_features_from_mat_files(mat_file_pathes, selected_test_names=None):
+        features_set = []
+        for file_path in mat_file_pathes:
+            patient_records = Record.extract_records_from_mat_file(file_path, selected_test_names)
+            patient_features = RecordFeatures.extract_features_from_patien_records(patient_records)
+            features_set.append(patient_features)
+        return features_set
 
     @classmethod
     def init_from_feature_extractor(cls, extractor: FeatureExtractor):
@@ -64,6 +79,7 @@ class RecordFeatures:
         feactures.spect_centroid_path_freq = extractor.spectral_centroid_freq(extractor.fft_path_vect, extractor.f_path_vect)
 
         return feactures
+
 
     @classmethod
     def init_from_pandas_row(cls, row):
