@@ -6,14 +6,11 @@ import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 20})
 import numpy as np
 
-import sys
-sys.path.append('C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis')
+from core.record_model import Record
+from core.feature_extractor_model import FeatureExtractor
+from core.record_features_model import RecordFeatures
 
-from record_model import Record
-from feature_extractor_model import FeatureExtractor
-from record_features_model import RecordFeatures
-
-import dma as DMA
+import dma_wrapper as DMA
 
 def get_file_pathes_in_dir(path: str, extension: str):
     file_names = []
@@ -65,12 +62,11 @@ def save_directed_dma_plots(x_open, y_open, x_closed, y_closed, title, folder_na
         plt.subplot(2,1,2)
         (angle, alpha) = DMA.exponent_for_angle(x_closed, y_closed)
         plt.plot(angle, alpha); plt.grid(); plt.title('Closed eyes')
-        plots_path = f"C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma_first_results\\dma_plots\\{folder_name}"
+        plots_path = f"C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma\\dma_plots\\{folder_name}"
         plt.savefig(f"{plots_path}\\{filename}-directed-dma.png")
         plt.close()
 
-
-# data = pd.read_csv("C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma_first_results\\samp0.csv")
+# data = pd.read_csv("C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma\\samp0.csv")
 # x = data.iloc[:, 0]
 # y = data.iloc[:, 1]
 # (angle, alpha) = DMA.exponent_for_angle_debug(x, y)
@@ -79,6 +75,7 @@ def save_directed_dma_plots(x_open, y_open, x_closed, y_closed, title, folder_na
 
 
 folder_names = {"rowing": "Rowing athletes", "diving": "Diving athletes", "healthy" : "Non sportsmen" }
+plots_path = "C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma\\dma_plots"
 
 for folder_name, title_text in folder_names.items():
     mat_file_pathes = get_file_pathes_in_dir(f"C:/Users/BohdanK/Dropbox/StabiloData/{folder_name}", extension="mat")
@@ -87,70 +84,102 @@ for folder_name, title_text in folder_names.items():
     log_F_open_x_list = []; log_F_open_y_list = []; log_F_open_2d_list = []
     log_F_closed_x_list = []; log_F_closed_y_list = []; log_F_closed_2d_list = []
     log_n_for_mean_1d = []; log_n_for_mean_2d = []
+
+    dir_dma_angle_open_list = []; dir_dma_angle_close_list = []
+
+    count = 0
     for filename, records_array in records_dict.items(): 
+        count = count + 1
+        # if count == 2: break
         fig = plt.figure()
         fig.suptitle(f"{folder_name}: {filename}")
-        fig.set_size_inches((24, 10)) 
+        fig.set_size_inches((10, 24)) 
 
-        plt.subplot(1,2,1)
+        # plt.subplot(2,1,1)
         open_eyes_record = records_array[0]
-        (log_n, log_F) = DMA.dma_d1(open_eyes_record.cop.x); log_n_for_mean_1d = log_n
-        if log_F.size in (24,25): log_F_open_x_list.append(log_F)
-        plot_dma(log_n, log_F, 'frontal plane')
-        (log_n, log_F) = DMA.dma_d1(open_eyes_record.cop.y)
-        if log_F.size in (24,25): log_F_open_y_list.append(log_F)
-        plot_dma(log_n, log_F, 'sagittal plane')
-        (log_n, log_F) = DMA.dma_d2(open_eyes_record.cop.x, open_eyes_record.cop.y); log_n_for_mean_2d = log_n
-        if log_F.size == 27: log_F_open_2d_list.append(log_F)
-        plot_dma(log_n, log_F, '2D')
-        plt.legend(); plt.grid(); plt.title("Open eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
+        # (log_n, log_F) = DMA.dma_d1(open_eyes_record.cop.x); log_n_for_mean_1d = log_n
+        # if log_F.size in (24,25): log_F_open_x_list.append(log_F)
+        # plot_dma(log_n, log_F, 'frontal plane')
+        # (log_n, log_F) = DMA.dma_d1(open_eyes_record.cop.y)
+        # if log_F.size in (24,25): log_F_open_y_list.append(log_F)
+        # plot_dma(log_n, log_F, 'sagittal plane')
+        # (log_n, log_F) = DMA.dma_d2(open_eyes_record.cop.x, open_eyes_record.cop.y); log_n_for_mean_2d = log_n
+        # if log_F.size == 27: log_F_open_2d_list.append(log_F)
+        # plot_dma(log_n, log_F, '2D')
+        # plt.legend(); plt.grid(); plt.title("Open eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
         
-        plt.subplot(1,2,2)
+        # plt.subplot(2,1,2)
         closed_eyes_record = records_array[1]
-        # (angle, alpha) = DMA.exponent_for_angle_debug(closed_eyes_record.cop.x, closed_eyes_record.cop.y)
-        (log_n, log_F) = DMA.dma_d1(closed_eyes_record.cop.x) 
-        if log_F.size in (24,25): log_F_closed_x_list.append(log_F)
-        plot_dma(log_n, log_F, 'frontal plane') 
-        (log_n, log_F) = DMA.dma_d1(closed_eyes_record.cop.y)
-        if log_F.size in (24,25): log_F_closed_y_list.append(log_F)
-        plot_dma(log_n, log_F, 'sagittal plane')
-        (log_n, log_F) = DMA.dma_d2(closed_eyes_record.cop.x, closed_eyes_record.cop.y)
-        if log_F.size == 27: log_F_closed_2d_list.append(log_F)
-        plot_dma(log_n, log_F, '2D')
-        plt.legend(); plt.grid(); plt.title("Closed eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
+        # # (angle, alpha) = DMA.exponent_for_angle_debug(closed_eyes_record.cop.x, closed_eyes_record.cop.y)
+        # (log_n, log_F) = DMA.dma_d1(closed_eyes_record.cop.x) 
+        # if log_F.size in (24,25): log_F_closed_x_list.append(log_F)
+        # plot_dma(log_n, log_F, 'frontal plane') 
+        # (log_n, log_F) = DMA.dma_d1(closed_eyes_record.cop.y)
+        # if log_F.size in (24,25): log_F_closed_y_list.append(log_F)
+        # plot_dma(log_n, log_F, 'sagittal plane')
+        # (log_n, log_F) = DMA.dma_d2(closed_eyes_record.cop.x, closed_eyes_record.cop.y)
+        # if log_F.size == 27: log_F_closed_2d_list.append(log_F)
+        # plot_dma(log_n, log_F, '2D')
+        # plt.legend(); plt.grid(); plt.title("Closed eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
 
-        plots_path = f"C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma_first_results\\dma_plots\\{folder_name}"
-        plt.savefig(f"{plots_path}\\{filename}.png")
-        plt.close()
+        # plt.savefig(f"{plots_path}\\{folder_name}\\{filename}.png")
+        # plt.close()
 
+        (angle, alpha) = DMA.exponent_for_angle(open_eyes_record.cop.x, open_eyes_record.cop.y)
+        dir_dma_angle_open_list.append([angle, alpha])
+        (angle, alpha) = DMA.exponent_for_angle(closed_eyes_record.cop.x, closed_eyes_record.cop.y)
+        dir_dma_angle_close_list.append([angle, alpha])
+        
         # save_directed_dma_plots(x_open=open_eyes_record.cop.x, y_open=open_eyes_record.cop.y, \
         #         x_closed=closed_eyes_record.cop.x, y_closed=closed_eyes_record.cop.y, \
         #         title=f"Directed DMA, {filename}", folder_name=folder_name, filename=filename)
 
+
+
+    average_dir_dma_angle_open = np.mean([el[1] for el in dir_dma_angle_open_list], 0)
+    average_dir_dma_angle_close = np.mean([el[1] for el in dir_dma_angle_close_list], 0)
+    
     fig = plt.figure()
-    fig.suptitle(title_text)
+    fig.suptitle(folder_name)
     fig.set_size_inches((24, 10)) 
-    
+
     plt.subplot(1,2,1)
-    log_F_open_x_mean = np.mean(log_F_open_x_list, axis=0)
-    plot_dma(log_n_for_mean_1d, log_F_open_x_mean, f'frontal plane')
-    log_F_open_y_mean = np.mean(log_F_open_y_list, axis=0)
-    plot_dma(log_n_for_mean_1d, log_F_open_y_mean, f'sagittal plane')
-    log_F_open_2d_mean = np.mean(log_F_open_2d_list, axis=0)
-    plot_dma(log_n_for_mean_2d, log_F_open_2d_mean, f'2D')
-    plt.legend(); plt.grid(); plt.title("Open eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
-    
+    plt.plot(angle, average_dir_dma_angle_open)
+    plt.xlabel('alpha'); plt.ylabel('angle')
+    plt.title('EO'); plt.grid()
+
     plt.subplot(1,2,2)
-    log_F_closed_x_mean = np.mean(log_F_closed_x_list, axis=0)
-    plot_dma(log_n_for_mean_1d, log_F_closed_x_mean, f'frontal plane')
-    log_F_closed_y_mean = np.mean(log_F_closed_y_list, axis=0)
-    plot_dma(log_n_for_mean_1d, log_F_closed_y_mean, f'sagittal plane')
-    log_F_closed_2d_mean = np.mean(log_F_closed_2d_list, axis=0)
-    plot_dma(log_n_for_mean_2d, log_F_closed_2d_mean, f'2D')
-    plt.legend(); plt.grid(); plt.title("Closed eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
+    plt.plot(angle, average_dir_dma_angle_close)
+    plt.xlabel('alpha'); plt.ylabel('angle')
+    plt.title('EC'); plt.grid()
     
-    plots_path = "C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma_first_results\\dma_plots"
-    plt.savefig(f"{plots_path}\\{folder_name}.png")
+    plt.savefig(f"{plots_path}\\directed-dma-{folder_name}.png")
     plt.close()
+
+
+#     fig = plt.figure()
+#     fig.suptitle(title_text)
+#     fig.set_size_inches((10, 24)) 
+    
+#     plt.subplot(2,1,1)
+#     log_F_open_x_mean = np.mean(log_F_open_x_list, axis=0)
+#     plot_dma(log_n_for_mean_1d, log_F_open_x_mean, f'frontal plane')
+#     log_F_open_y_mean = np.mean(log_F_open_y_list, axis=0)
+#     plot_dma(log_n_for_mean_1d, log_F_open_y_mean, f'sagittal plane')
+#     log_F_open_2d_mean = np.mean(log_F_open_2d_list, axis=0)
+#     plot_dma(log_n_for_mean_2d, log_F_open_2d_mean, f'2D')
+#     plt.legend(); plt.grid(); plt.title("Open eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
+    
+#     plt.subplot(2,1,2)
+#     log_F_closed_x_mean = np.mean(log_F_closed_x_list, axis=0)
+#     plot_dma(log_n_for_mean_1d, log_F_closed_x_mean, f'frontal plane')
+#     log_F_closed_y_mean = np.mean(log_F_closed_y_list, axis=0)
+#     plot_dma(log_n_for_mean_1d, log_F_closed_y_mean, f'sagittal plane')
+#     log_F_closed_2d_mean = np.mean(log_F_closed_2d_list, axis=0)
+#     plot_dma(log_n_for_mean_2d, log_F_closed_2d_mean, f'2D')
+#     plt.legend(); plt.grid(); plt.title("Closed eyes"); plt.xlabel('log(n)'); plt.ylabel('log(F)')
+    
+#     plt.savefig(f"{plots_path}\\{folder_name}.png")
+#     plt.close()
 
         

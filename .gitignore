@@ -5,3 +5,4 @@ __pycache__/
 # *.json
 *.png
 *.csv
+node_modules

@@ -403,10 +403,10 @@ def calculate_alpha_exp(log_n=None, log_F=None, bending_point=None):
 
     bend_point_x = bending_point
 
-    # x = np.expand_dims(np.asarray(log_n[bend_point_x:len(log_n)]), axis=1)
-    # y = np.asarray(log_F[bend_point_x:len(log_F)])
-    x = np.expand_dims(np.asarray(log_n[0:bend_point_x+1]), axis=1)
-    y = np.asarray(log_F[0:bend_point_x+1])
+    x = np.expand_dims(np.asarray(log_n[bend_point_x:len(log_n)]), axis=1)
+    y = np.asarray(log_F[bend_point_x:len(log_F)])
+    # x = np.expand_dims(np.asarray(log_n[0:bend_point_x+1]), axis=1)
+    # y = np.asarray(log_F[0:bend_point_x+1])
 
 
     reg = LinearRegression().fit(x, y)
@@ -425,13 +425,13 @@ def get_log_log_plot_bending_point(xvals=None, yvals=None):
     from scipy.optimize import curve_fit
 
     for i, point in enumerate(xvals):
-        # if i > 2:
-        global x0
-        x0 = point
-        popt, pcov = curve_fit(func, xvals, yvals)  # fitting our model to the observed data
-        y_predicted = func(xvals, *popt)  # calculating predictions, given by our fitted model
-        aic_vals.append(aic(y_observed=yvals, y_predicted=y_predicted, k=5))
-        x_points.append(point)
+        if i > 2:
+            global x0
+            x0 = point
+            popt, pcov = curve_fit(func, xvals, yvals)  # fitting our model to the observed data
+            y_predicted = func(xvals, *popt)  # calculating predictions, given by our fitted model
+            aic_vals.append(aic(y_observed=yvals, y_predicted=y_predicted, k=5))
+            x_points.append(point)
 
     bending_point = np.min(aic_vals)
     x_bend_p = aic_vals.index(bending_point)

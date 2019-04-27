@@ -41,7 +41,7 @@ def __execute_program_on_file(cmd, data_path):
 
 
 def dma_d1(vector):
-    current_path = f"{os.getcwd()}\\dma_first_results"
+    current_path = f"{os.getcwd()}\\dma"
     data_file_path = f"{current_path}\\temp_data.csv"
     df = pd.DataFrame(vector)
     df.transpose()
@@ -55,7 +55,7 @@ def dma_d1(vector):
     return __exract_vectors_from_dma_data(data)
 
 def dma_d2(x_vector, y_vector):
-    current_path = f"{os.getcwd()}\\dma_first_results"
+    current_path = f"{os.getcwd()}\\dma"
     data_file_path = f"{current_path}\\temp_data.csv"
     np_array = np.column_stack((x_vector, y_vector))
     df = pd.DataFrame(np_array)
@@ -72,7 +72,7 @@ def dma_d2(x_vector, y_vector):
 
 
 def dma_directed(x_vector, y_vector):
-    current_path = f"{os.getcwd()}\\dma_first_results"
+    current_path = f"{os.getcwd()}\\dma"
     data_file_path = f"{current_path}\\temp_data.csv"
     np_array = np.column_stack((x_vector, y_vector))
     df = pd.DataFrame(np_array)

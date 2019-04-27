@@ -20,12 +20,12 @@ def get_file_pathes_in_dir(path: str, extension: str):
 if __name__ == "__main__":
     # study individual patient
     patient_records = Record.extract_records_from_mat_file(
-        file_path = 'C:/Users/BohdanK/Dropbox/StabiloData/rowing/altuhov_26-Nov-2018.mat', 
-        selected_tests=['ОС ОГ', 'ОС ЗГ'])
+        file_path = 'C:/Users/BohdanK/Dropbox/StabiloData/rowing/altuhov_26-Nov-2018.mat')
     patient_features = RecordFeatures.extract_features_from_patien_records(patient_records)
 
-    chosen_record = patient_records[0] # for example purposes, first record was selected  
+    chosen_record = patient_records[3] # for example purposes, first record was selected  
 
+    plt.rcParams.update({'font.size': 20})
     plt.figure(0); visualizer.plot_force_signals(plt, chosen_record.get_time_vector(), chosen_record.force_signals)
     plt.figure(1); visualizer.plot_cop_signal(plt, chosen_record.cop.x, chosen_record.cop.y)
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     plt.figure(4)
     plt.plot(chosen_record.get_time_vector(), chosen_record.cop.x, label="X")
     plt.plot(chosen_record.get_time_vector(), chosen_record.cop.y, label="Y")
-    plt.title("CoP Oscillations in X and Y planes")
+    plt.title("CoP Oscillations on X and Y axes"); plt.legend()
     plt.xlabel("time, s"); plt.ylabel("distance from center, cm"); plt.grid()
 
     visualizer.plot_cop_with_ellipse(chosen_record.cop.x, chosen_record.cop.y, chosen_extractor.prediction_ellipse(), 'cm')
