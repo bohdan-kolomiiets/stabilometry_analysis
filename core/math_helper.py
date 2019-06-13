@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.fftpack import fft
-import matplotlib.pyplot as plt
-
+from scipy.signal import butter, filtfilt, freqz
 
 def calc_fft(x, fs):
     n_half = int(x.size / 2)
@@ -10,7 +9,41 @@ def calc_fft(x, fs):
     return f, fourier
 
 
+def butter_lowpass_filter(data, cut_f, fs, order=10):
+    b, a = __butter_lowpass_coefs(cut_f, fs, order=order)
+    y = filtfilt(b, a, data)
+    return y
+def __butter_lowpass_coefs(highcut, fs, order):
+    nyq = 0.5 * fs
+    high = highcut / nyq
+    b, a = butter(order, high, btype='low')
+    return b, a
+
+
+def __butter_bandpass_coefs(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
 if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
+    plt.figure()
+    fs = 100
+    for order in [2, 3, 6, 15]:
+        b, a = __butter_lowpass_coefs(highcut=20, fs=fs, order=order)
+        w, h = freqz(b, a, worN=2000)
+        plt.plot((fs * 0.5 / np.pi) * w, abs(h), label="order = %d" % order)
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Gain')
+    plt.grid(True)
+    plt.legend(loc='best')
+    plt.show()
+
+
+    
     N = 300
     T = 30  # sec
     t = np.linspace(0, T, N)

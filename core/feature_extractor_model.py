@@ -3,8 +3,8 @@ import statistics as stat
 import scipy.signal as sci_sig
 from typing import Tuple
 
-import math_helper
-from record_model import Record
+import core.math_helper as math_helper 
+from core.record_model import Record
 
 
 class FeatureExtractor:

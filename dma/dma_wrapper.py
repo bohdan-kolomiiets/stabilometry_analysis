@@ -5,8 +5,13 @@ import json
 import os
 import pandas as pd
 
-from dfa_wrapper import get_log_log_plot_bending_point, calculate_alpha_exp, get_log_log_plot_bending_point_with_debug
-        
+from .dfa_wrapper import get_log_log_plot_bending_point, calculate_alpha_exp, get_log_log_plot_bending_point_with_debug
+
+def get_current_folder():
+    from pathlib import Path
+    return str(Path(__file__).parent)
+   
+
 def calc_scaling_exponent(log_n, log_F):
     (_, index) = get_log_log_plot_bending_point(log_n, log_F)
     (alpha, b) = __calc_scaling_exponent(log_n, log_F, index)
@@ -41,7 +46,8 @@ def __execute_program_on_file(cmd, data_path):
 
 
 def dma_d1(vector):
-    current_path = f"{os.getcwd()}\\dma"
+    current_path = f"{get_current_folder()}"
+
     data_file_path = f"{current_path}\\temp_data.csv"
     df = pd.DataFrame(vector)
     df.transpose()
@@ -55,7 +61,7 @@ def dma_d1(vector):
     return __exract_vectors_from_dma_data(data)
 
 def dma_d2(x_vector, y_vector):
-    current_path = f"{os.getcwd()}\\dma"
+    current_path = f"{get_current_folder()}"
     data_file_path = f"{current_path}\\temp_data.csv"
     np_array = np.column_stack((x_vector, y_vector))
     df = pd.DataFrame(np_array)
@@ -71,8 +77,8 @@ def dma_d2(x_vector, y_vector):
     return __exract_vectors_from_dma_data(data)
 
 
-def dma_directed(x_vector, y_vector):
-    current_path = f"{os.getcwd()}\\dma"
+def __dma_directed_raw(x_vector, y_vector):
+    current_path = f"{get_current_folder()}"
     data_file_path = f"{current_path}\\temp_data.csv"
     np_array = np.column_stack((x_vector, y_vector))
     df = pd.DataFrame(np_array)
@@ -83,8 +89,23 @@ def dma_directed(x_vector, y_vector):
     (data, metadata) = out.split('Input')
     return __exract_vectors_from_direct_dma_data(data)
 
-def exponent_for_angle(x_vector, y_vector):
-    (angle_in_rads, log_n, log_F) = dma_directed(x_vector, y_vector)
+class DirectedDmaItem:
+    def __init__(self, alpha, log_n, log_F):
+        self.alpha = alpha
+        self.log_n = log_n
+        self.log_F = log_F
+
+def dma_directed_for_angles(x_vector, y_vector):
+    (angle_in_rads, log_n, log_F) = __dma_directed_raw(x_vector, y_vector)
+    items = []
+    for angle in np.unique(angle_in_rads):
+        angle_log_n = log_n[angle_in_rads == angle]
+        angle_log_F = log_F[angle_in_rads == angle]
+        items.append(DirectedDmaItem(angle, angle_log_n, angle_log_F))
+    return items
+
+def dma_directed(x_vector, y_vector):
+    (angle_in_rads, log_n, log_F) = __dma_directed_raw(x_vector, y_vector)
     unique_angle_vector = np.unique(angle_in_rads)
 
     alpha_vector = []
@@ -98,8 +119,8 @@ def exponent_for_angle(x_vector, y_vector):
     return (unique_angle_vector, alpha_vector)
 
 
-def exponent_for_angle_debug(x_vector, y_vector):
-    (angle_in_rads, log_n, log_F) = dma_directed(x_vector, y_vector)
+def dma_directed_debug(x_vector, y_vector):
+    (angle_in_rads, log_n, log_F) = __dma_directed_raw(x_vector, y_vector)
     unique_angle_vector = np.unique(angle_in_rads)
 
     alpha_vector = []

@@ -1,5 +1,5 @@
-from record_model import Record
-from feature_extractor_model import FeatureExtractor
+from core.record_model import Record
+from core.feature_extractor_model import FeatureExtractor
 
 from typing import List
 from collections import OrderedDict
