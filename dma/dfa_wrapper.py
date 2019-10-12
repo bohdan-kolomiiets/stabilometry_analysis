@@ -395,11 +395,11 @@ def perform_new_dfa(**kwargs):
 
     exp_p, point_loc = get_log_log_plot_bending_point(xvals=log_n, yvals=log_F)
 
-    alpha = calculate_alpha_exp(log_n=log_n, log_F=log_F, bending_point = point_loc)
+    alpha = calculate_alpha_exp_from_bending_point(log_n=log_n, log_F=log_F, bending_point = point_loc)
 
     return alpha[0]
 
-def calculate_alpha_exp(log_n=None, log_F=None, bending_point=None):
+def calculate_alpha_exp_from_bending_point(log_n=None, log_F=None, bending_point=None):
 
     bend_point_x = bending_point
 

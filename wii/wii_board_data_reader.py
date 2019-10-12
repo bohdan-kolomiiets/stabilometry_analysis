@@ -22,8 +22,9 @@ class WiiBoardData:
         y_filtered = math_helper.butter_lowpass_filter(self.resampled_cop_y, cut_f, self.resampled_f_hz)
         return (x_filtered, y_filtered)
 
-
 def __norm_and_resample_time_vect(f_hz, original_time_vect):
+    # original_time_vect[-1] = '0'
+    # original_time_vect = np.array([float(el.replace(',', '')) for el in original_time_vect])
     time_vect_norm = (original_time_vect - original_time_vect[0])/1000
     T = time_vect_norm[-1]
     F = f_hz
@@ -37,6 +38,16 @@ def __resample_data(data, time_vect):
     resampled_data, _ = sc.resample(data, len(time_vect), time_vect)
     return resampled_data
 
+def __remove_spikes_from(vector):
+    diff = np.diff(vector)
+    std = np.std(diff)
+    median = np.median(diff)
+    centered = diff - median
+    spikes = np.array(np.where(np.abs(centered) > 15*std)) + 1
+    print(spikes)
+
+    vector[spikes] = np.median(vector)
+
 
 def read_wii_board_data(file_path):
     import pandas as pd
@@ -48,13 +59,15 @@ def read_wii_board_data(file_path):
     wii_data.top_right_f_kg = cvs_data.iloc[:, 2]
     wii_data.bottom_left_f_kg = cvs_data.iloc[:, 3]
     wii_data.bottom_right_f_kg = cvs_data.iloc[:, 4]
-    wii_data.cop_x = cvs_data.iloc[:, 5]
-    wii_data.cop_y = cvs_data.iloc[:, 6] * -1
+    wii_data.cop_x = np.array(cvs_data.iloc[:, 5])
+    wii_data.cop_y = np.array(cvs_data.iloc[:, 6] * -1)
     wii_data.total_f = cvs_data.iloc[:, 7]
+
+    # __remove_spikes_from(wii_data.cop_x)
+    # __remove_spikes_from(wii_data.cop_y)
 
     f_hz = 100
     time_vect_resampled = __norm_and_resample_time_vect(f_hz, original_time_vect=np.array(wii_data.time_ms))
-
     wii_data.resampled_f_hz = f_hz
     wii_data.resampled_time_ms = time_vect_resampled
     wii_data.resampled_cop_x = __resample_data(np.array(wii_data.cop_x), time_vect_resampled)

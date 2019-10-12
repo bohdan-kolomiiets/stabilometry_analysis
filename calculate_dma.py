@@ -20,7 +20,7 @@ def extract_records_from_mat_files(mat_file_pathes):
     records_dict = {}
     for file_path in mat_file_pathes:
         mat_data = loadmat(file_path).get('s')[0]
-        file_name = extract_name_from_path(file_path)
+        file_name = io.extract_name_from_path(file_path)
 
         patient_records = []
         for mat_data_element in mat_data:
@@ -33,7 +33,7 @@ def extract_records_from_mat_files(mat_file_pathes):
 
 
 def plot_dma(log_n, log_F, title):
-        (alpha, b, index) = DMA.calc_scaling_exponent(log_n, log_F)
+        (alpha, b, index) = DMA.calc_scaling_exponent_by_bending_point(log_n, log_F)
 
         p = plt.plot(log_n, log_F, label=f"{title}, alpha={alpha:.3f}")
 
@@ -57,6 +57,46 @@ def save_directed_dma_plots(x_open, y_open, x_closed, y_closed, title, folder_na
         plt.savefig(f"{plots_path}\\{filename}-directed-dma.png")
         plt.close()
 
+def plot_cop_and_dma(record, path_part):    
+        fig = plt.figure()
+        fig.set_size_inches((30, 12))
+        plt.rcParams.update({'font.size': 17})
+
+        fig.suptitle(f'{record.patient_name}, {record.record_name}')
+        
+        plt.subplot(1,2,1)
+        plt.plot(record.get_time_vector(), record.cop.x, color='r', label='X(t)')
+        plt.plot(record.get_time_vector(), record.cop.y, color='b', label='Y(t)')
+        plt.legend(loc='upper right')
+        plt.ylim([-10, 10])
+        plt.grid()
+        
+        plt.subplot(1,2,2)
+        
+        (log_n, log_F) = DMA.dma_d1(record.cop.x)
+        (alpha, _, index) = DMA.calc_scaling_exponent_by_bending_point(log_n, log_F)
+        p = plt.plot(log_n, log_F, color='r', label=f'DMA(X), alpha={alpha:.3f}')
+        plt.plot(log_n[index], log_F[index], color=p[0].get_color(), marker='o')
+
+        (log_n, log_F) = DMA.dma_d1(record.cop.y)
+        (alpha, _, index) = DMA.calc_scaling_exponent_by_bending_point(log_n, log_F)
+        p = plt.plot(log_n, log_F, color='b', label=f'DMA(Y), alpha={alpha:.3f}')
+        plt.plot(log_n[index], log_F[index], color=p[0].get_color(), marker='o')
+        
+        # (log_n, log_F) = DMA.dma_d2(record.cop.x, record.cop.y)
+        # (alpha, _, index) = DMA.calc_scaling_exponent(log_n, log_F)
+        # p = plt.plot(log_n, log_F, color='g', label=f'DMA(2D), alpha={alpha:.3f}')
+        # plt.plot(log_n[index], log_F[index], color=p[0].get_color(), marker='o')
+        
+        plt.legend(loc='upper right')
+        plt.grid()
+
+        folder_path = r'C:\Users\bohdank\Documents\MyProjects\science\stabilometry_analysis\dma\dma_plots\cop_dma'
+        plt.savefig(f'{folder_path}\\{path_part}')
+        # plt.show()
+
+
+
 # data = pd.read_csv("C:\\Users\\bohdank\\Documents\\MyProjects\\stabilometry_analysis\\dma\\samp0.csv")
 # x = data.iloc[:, 0]
 # y = data.iloc[:, 1]
@@ -70,9 +110,21 @@ import os
 
 plots_path =  f"{os.getcwd()}\dma_plots"
 
+
 for folder_name, title_text in folder_names.items():
     mat_file_pathes = io.get_file_pathes_in_dir(f"C:/Users/BohdanK/Dropbox/StabiloData/{folder_name}", extension="mat")
-    records_dict = extract_records_from_mat_files(mat_file_pathes)
+    group_records_dict = extract_records_from_mat_files(mat_file_pathes)
+
+    for filename, records_array in group_records_dict.items(): 
+        open_eyes_record = records_array[0]
+        closed_eyes_record = records_array[1]
+        plot_cop_and_dma(open_eyes_record, f'{folder_name}\\{filename}_open.png')
+        plot_cop_and_dma(closed_eyes_record, f'{folder_name}\\{filename}_closed.png')
+
+
+for folder_name, title_text in folder_names.items():
+    mat_file_pathes = io.get_file_pathes_in_dir(f"C:/Users/BohdanK/Dropbox/StabiloData/{folder_name}", extension="mat")
+    group_records_dict = extract_records_from_mat_files(mat_file_pathes)
 
     log_F_open_x_list = []; log_F_open_y_list = []; log_F_open_2d_list = []
     log_F_closed_x_list = []; log_F_closed_y_list = []; log_F_closed_2d_list = []
@@ -81,7 +133,7 @@ for folder_name, title_text in folder_names.items():
     dir_dma_angle_open_list = []; dir_dma_angle_close_list = []
 
     count = 0
-    for filename, records_array in records_dict.items(): 
+    for filename, records_array in group_records_dict.items(): 
         # count = count + 1
         # if count == 2: break
 
@@ -90,10 +142,15 @@ for folder_name, title_text in folder_names.items():
         # fig.set_size_inches((10, 24)) 
 
         open_eyes_record = records_array[0]
+        
         (log_n, log_F) = DMA.dma_d1(open_eyes_record.cop.x); log_n_for_mean_1d = log_n
         if log_F.size in (24,25): log_F_open_x_list.append(log_F)
+
+                
         (log_n, log_F) = DMA.dma_d1(open_eyes_record.cop.y)
         if log_F.size in (24,25): log_F_open_y_list.append(log_F)
+        
+        
         (log_n, log_F) = DMA.dma_d2(open_eyes_record.cop.x, open_eyes_record.cop.y); log_n_for_mean_2d = log_n
         if log_F.size == 27: log_F_open_2d_list.append(log_F)
         
