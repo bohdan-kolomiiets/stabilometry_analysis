@@ -79,16 +79,20 @@ save_path = r'C:\Users\bohdank\Dropbox\StabiloData\wii_board\ken_comparison'
 dma_start_index = 6 # 1.2
 dma_end_index = 22 # 1.8
 
+
 for path in record_paths:
-    
     data = wii.read_wii_board_data(path)
+    corr_coef = np.corrcoef(data.cop_x, data.cop_y)[0, 1]
+    print(f'{path}:  {corr_coef}')
+
+
+    # file_name = io.extract_name_from_path(path)
+
+    # figure = construct_figure_from(data.cop_x, data.cop_y, file_name)
+    # plt.savefig(fr"{save_path}\{file_name}.png")
     
-    file_name = io.extract_name_from_path(path)
-
-    figure = construct_figure_from(data.cop_x, data.cop_y, file_name)
-    plt.savefig(fr"{save_path}\{file_name}.png")
-    
-    data_frame = pd.DataFrame({'time_ms': data.time_ms, 'x_cm': data.cop_x, 'y_cm': data.cop_y})
-    data_frame.to_csv(fr"{save_path}\from-function_{file_name}.csv", index=False)
+    # data_frame = pd.DataFrame({'time_ms': data.time_ms, 'x_cm': data.cop_x, 'y_cm': data.cop_y})
+    # data_frame.to_csv(fr"{save_path}\from-function_{file_name}.csv", index=False)
 
 
+pass

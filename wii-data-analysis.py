@@ -110,7 +110,7 @@ for data_folder in data_folders:
     for file_path in file_pathes:
         if 'WiiWhitenoise3m' not in file_path:
             continue
-        file_name = io.extract_name_from_path(file_path)
+        file_name = io.extract_file_name_from_path(file_path)
 
         data = wii.read_wii_board_data(file_path)
         (x_filtered, y_filtered) = data.get_lowpass_filtered_cop(cut_f) #(data.resampled_cop_x, data.resampled_cop_y)

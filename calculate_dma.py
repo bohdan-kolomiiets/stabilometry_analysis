@@ -20,7 +20,7 @@ def extract_records_from_mat_files(mat_file_pathes):
     records_dict = {}
     for file_path in mat_file_pathes:
         mat_data = loadmat(file_path).get('s')[0]
-        file_name = io.extract_name_from_path(file_path)
+        file_name = io.extract_file_name_from_path(file_path)
 
         patient_records = []
         for mat_data_element in mat_data:
